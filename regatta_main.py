@@ -16,7 +16,7 @@ default_checksum="a235bc2578dd67a5d262745d68c56452"
 
 if __name__ == '__main__':
 
-	if False :
+	if True :
 		longitude_start=-52
 		latitude_start=-30
 		longitude_end=-25

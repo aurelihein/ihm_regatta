@@ -70,8 +70,8 @@ def get_squares_from_to(connection,longitude_start,latitude_start,longitude_end,
 	#	raise ValueError("longitude_start,longitude_end,latitude_start,latitude_end has to be modulo 10")
 	nb_longitude_to_ask=(longitude_start_searched - longitude_end_searched)*-1 / 10
 	nb_latitude_to_ask=(latitude_start_searched - latitude_end_searched) / 10
-	print "nb_longitude_to_ask:"+str(nb_longitude_to_ask)
-	print "nb_latitude_to_ask:"+str(nb_latitude_to_ask)
+	#print "nb_longitude_to_ask:"+str(nb_longitude_to_ask)
+	#print "nb_latitude_to_ask:"+str(nb_latitude_to_ask)
 	squares=[]	
 	for lon in range(0,nb_longitude_to_ask) :
 		for lat in range(0,nb_latitude_to_ask) :

@@ -34,33 +34,43 @@ class RegattaMainFrame(Frame):
         self.style = Style()
         self.style.theme_use("default")
         self.pack(fill=BOTH, expand=1)
+
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(3, pad=7)
+        self.rowconfigure(3, weight=1)
+        self.rowconfigure(5, pad=7)
+        
         lbl = Label(self, text="Windows")
-        lbl.grid( column=0)
+        lbl.grid(sticky=W, pady=4, padx=5)
 
 
 	self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=1)
-        self.canvas.grid(row=0, column=1, rowspan=15, sticky=E+W+S+N)
+        self.canvas.grid(row=1, column=0, columnspan=2, rowspan=4, 
+            padx=5, sticky=E+W+S+N)
 	
-	self.showSea(self.longitude_start,self.latitude_start,self.longitude_end,self.latitude_end,0)
+	self.showSea(self.longitude_start,self.latitude_start,self.longitude_end,self.latitude_end)
         
-        abtn = Button(self, text="0H",command=self.button_0h)
-        abtn.grid(row=1, column=0)
-
-        cbtn = Button(self, text="12H",command=self.button_12h)
-        cbtn.grid(row=2, column=0)
-
-        cbtn = Button(self, text="24H",command=self.button_24h)
-        cbtn.grid(row=3, column=0)
+        abtn = Button(self, text="Update",command=self.button_update)
+        abtn.grid(row=1, column=3)
 
         cbtn = Button(self, text="Close",command=self.button_close)
-        cbtn.grid(row=5, column=0)
-        
-        #hbtn = Button(self, text="Help")
-        #hbtn.grid(row=5, column=0, padx=5)
+        cbtn.grid(row=2, column=3, pady=4)
 
-        #obtn = Button(self, text="OK")
-        #obtn.grid(row=5, column=3)
+	abtn = Button(self, text="0H",command=self.button_0h)
+        abtn.grid(row=3, column=3)
+
+        cbtn = Button(self, text="12H",command=self.button_12h)
+        cbtn.grid(row=4, column=3)
+
+        cbtn = Button(self, text="24H",command=self.button_24h)
+        cbtn.grid(row=5, column=3)
+        
+        hbtn = Button(self, text="Help")
+        hbtn.grid(row=6, column=0, padx=5)
+
+        obtn = Button(self, text="OK")
+        obtn.grid(row=6, column=3)
 
     def set_sea(self,sea):
 	self.sea = sea
@@ -74,9 +84,9 @@ class RegattaMainFrame(Frame):
 			self.showWindSquareBlock(i,longitude_start,latitude_start)
 			self.showWindSquarePosition(i,longitude_start,latitude_start)
 			self.showWindSquareWind(i,longitude_start,latitude_start,hour_prevision)
-	self.showBoat(-51,-45,longitude_start,latitude_start)
 		#else :
 			#print "bad block in:("+str(i.get_x())+","+str(i.get_y())+")"
+	self.showBoat(-51,-45,longitude_start,latitude_start)
         
     def showBoat(self,x,y,longitude_start,latitude_start):
 	LEN_CIRCLE=6

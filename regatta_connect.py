@@ -66,19 +66,30 @@ class RegattaConnection(object):
 		print get_position_xml
 
 	def get_winds_xml(self,longitude,latitude):
-		magic_numbers=["075849","115805"]
+		magic_numbers=["075849","115805","075922","115839"]
 		if self.is_connected() == False :
 			raise ValueError, "Unable to get_winds_xml without being logged in"
 			return False
 		today=time.strftime("%Y%m%d")
 		if time.strftime("%p")=='AM' :
-			magic_number=magic_numbers[0]
+			magic_number=magic_numbers[2]
 		else:
-			magic_number=magic_numbers[1]
+			magic_number=magic_numbers[3]
+
 		url = "http://datacenter.manyplayers.com/winds/dated_1x1/"
-		#url = url + "/"+latitude+"/meteo_"+today+"075849"+"_"+longitude+"_"+latitude+".xml"#matin 20130118
-		url = url + "/"+latitude+"/meteo_"+today+magic_number+"_"+longitude+"_"+latitude+".xml"#apres midi 20130118
-		return self.get_a_winds_xml(url)
+		url = url + "/"+latitude+"/meteo_"+today+magic_number+"_"+longitude+"_"+latitude+".xml"
+		fileurl="meteo_"+today+"_"+longitude+"_"+latitude+".xml"
+		try :
+			with open("saved_xml/"+fileurl) as f:
+				returned = f.read()
+				print "Get xml from file"
+		except :
+			returned = self.get_a_winds_xml(url)
+			myFile = open("saved_xml/"+fileurl,'w')
+			myFile.write(returned)
+			myFile.close()
+			print "Get xml from web"		
+		return returned
 
 	def get_a_winds_xml(self,url):
 		returned = ""

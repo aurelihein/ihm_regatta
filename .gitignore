@@ -1,5 +1,11 @@
 *.py[cod]
 
+#dossier sauvegarde xml
+saved_xml
+
+# Gedit save
+*~
+
 # C extensions
 *.so
 
