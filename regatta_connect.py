@@ -1,4 +1,5 @@
 import cookielib, urllib, urllib2, sys, time
+import regatta_tools as mytools
 
 base_path="http://vendeeglobevirtuel.virtualregatta.com/core/Service/ServiceCaller.php"
 
@@ -9,13 +10,63 @@ class RegattaConnection(object):
 		self.debug = 0
 		self.userid=""
 		self.checksum=""
+		self.getuser_checksum=""
+		self.winddate=""
+		self.myLongitude=0
+		self.myLatitude=0
+		self.myCap=0
+		self.mySpeed=0
 	def __str__(self):
 		return "userid:"+str(self.userid)+"-checksum:"+str(self.checksum)
+	def get_maps(self):
+		directory_saved="saved_png/"
+		very_base_url = "http://datacenter.manyplayers.com/maps/dalles/4227081/"
+		a = 5
+		for b in range(0,12) :
+			for c in range(0,8):
+				continuous_url = "/"+str(a)+"/"+str(int(b/10))+"/"+str(int(c/10))+"/"
+				png_url = "map_"+str(a)+"_"+str(b)+"_"+str(c)+".png"
+				try :
+					with open(directory_saved+png_url) as f:
+						#we already have it in directory
+						returned = f.read()
+						#print "Get xml from file"
+				except :
+					#download it because we don't have it yet
+					img = self.get_a_map_png(very_base_url+continuous_url+png_url)
+					if not img == "":
+						open(directory_saved+png_url,"wb").write(img)
+		a = 6
+		for b in range(0,24) :
+			for c in range(0,16):
+				continuous_url = "/"+str(a)+"/"+str(int(b/10))+"/"+str(int(c/10))+"/"
+				png_url = "map_"+str(a)+"_"+str(b)+"_"+str(c)+".png"
+				try :
+					with open(directory_saved+png_url) as f:
+						#we already have it in directory
+						returned = f.read()
+						#print "Get xml from file"
+				except :
+					#download it because we don't have it yet
+					img = self.get_a_map_png(very_base_url+continuous_url+png_url)
+					if not img == "":
+						open(directory_saved+png_url,"wb").write(img)
+
+	def get_a_map_png(self,url):
+		returned = ""
+		try :
+			returned = urllib2.urlopen(url).read()
+			print("Fetching png url:"+url)
+		except urllib2.HTTPError, e:
+			print "bad url:"+str(e.code)+"=>"+url
+		return returned
+
 	def get_login(self):
 		return str(self)
-	def set_login(self,userid,checksum):
+	def set_login(self,userid,checksum,getuser_checksum):
 		self.userid = userid
 		self.checksum = checksum
+		self.getuser_checksum = getuser_checksum
 	def set_debug(self,value):
 		self.debug = value
 	def try_login(self):
@@ -56,14 +107,21 @@ class RegattaConnection(object):
 			return False
 		return True
 
-	def get_position(self):
+	def get_position_and_winddate(self):
 		if self.is_connected() == False :
 			raise ValueError, "Unable to get_position without being logged in"
 			return False
-		url=base_path+"?service=GetUser&id_user="+self.userid+"&lang=FR&light=1&auto=1&checksum="+self.checksum
+		url=base_path+"?service=GetUser&id_user="+self.userid+"&lang=FR&light=1&checksum="+self.getuser_checksum
+		print url
 		get_position_xml = urllib2.urlopen(url).read(500000)
-		print "---------------------------------------"
-		print get_position_xml
+		self.winddate=mytools.get_windDate_from_user_xml(get_position_xml)
+		self.myLongitude,self.myLatitude,self.myCap,self.mySpeed=mytools.get_position_from_user_xml(get_position_xml)
+		#print "windDate:"+self.winddate
+		print "position:"+str(self.myLongitude)+","+str(self.myLatitude)+"|cap:"+str(self.myCap)+"|speed:"+str(self.mySpeed)
+		return get_position_xml
+
+	def get_my_position(self):
+		return self.myLongitude,self.myLatitude,self.myCap,self.mySpeed
 
 	def get_winds_xml(self,longitude,latitude):
 		magic_numbers=["075849","115805","075922","115839"]
@@ -77,12 +135,15 @@ class RegattaConnection(object):
 			magic_number=magic_numbers[3]
 
 		url = "http://datacenter.manyplayers.com/winds/dated_1x1/"
-		url = url + "/"+latitude+"/meteo_"+today+magic_number+"_"+longitude+"_"+latitude+".xml"
+		if self.winddate=="":
+			url = url + "/"+latitude+"/meteo_"+today+magic_number+"_"+longitude+"_"+latitude+".xml"
+		else :
+			url = url + "/"+latitude+"/meteo_"+self.winddate+"_"+longitude+"_"+latitude+".xml"
 		fileurl="meteo_"+today+"_"+longitude+"_"+latitude+".xml"
 		try :
 			with open("saved_xml/"+fileurl) as f:
 				returned = f.read()
-				print "Get xml from file"
+				#print "Get xml from file"
 		except :
 			returned = self.get_a_winds_xml(url)
 			myFile = open("saved_xml/"+fileurl,'w')

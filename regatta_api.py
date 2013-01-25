@@ -47,8 +47,10 @@ class Sea(object):
     def get_squares(self):
 	return self.squares
     def get_squares_at(self,x,y):
+	x_searched = round(x)
+	y_searched = round(y)
 	for i in self.squares :
-		if i.get_x() == x and i.get_y() == y :
+		if i.get_x() == x_searched and i.get_y() == y_searched :
 			return i
     def __str__(self):
 	all_str=""
@@ -62,10 +64,10 @@ class Sea(object):
 def get_squares_from_to(connection,longitude_start,latitude_start,longitude_end,latitude_end):
 	if longitude_start >= longitude_end or latitude_start <= latitude_end :
 		raise ValueError("It should be longitude_start < longitude_end et latitude_start > latitude_end")
-	longitude_start_searched = (longitude_start /10)*10
-	latitude_start_searched = (latitude_start /10)*10
-	longitude_end_searched = (longitude_end /10)*10
-	latitude_end_searched = (latitude_end /10)*10
+	longitude_start_searched = (int(longitude_start) /10)*10
+	latitude_start_searched = (int(latitude_start) /10)*10
+	longitude_end_searched = (int(longitude_end) /10)*10
+	latitude_end_searched = (int(latitude_end) /10)*10
 	#if longitude_start % 10 or longitude_end % 10 or latitude_start % 10 or latitude_end % 10 :
 	#	raise ValueError("longitude_start,longitude_end,latitude_start,latitude_end has to be modulo 10")
 	nb_longitude_to_ask=(longitude_start_searched - longitude_end_searched)*-1 / 10
